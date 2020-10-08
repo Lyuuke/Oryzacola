@@ -21,9 +21,9 @@ a = Oryza(SeedShredding = (True, False), FullCaryopsis = True)
 ```
 … will give a crop whose "seed shredding" trait is heterozygous & dominant, while "full caryopsis" trait is homozygous & dominant.
 
-Any "new" rice crop has its *growth stage* of 0, which means the crop is still a sprout. Currently any `Oryza` instance will not grow as time elapses. You can use `Oryza.maturize()` to ripen it, allowing the crop to produce pollens and seeds.
+Any "new" rice crop has its *growth stage* (`Oryza.growth_stage`) of 0, which means the crop is still a sprout. Currently any `Oryza` instance will not grow as time elapses. You can use `Oryza.maturize()` to ripen it, allowing the crop to produce pollens and seeds.
 
-After a rice crop becoming mature, you can hybrid two crops using `*`:
+After a rice crop having become mature, you can hybrid two crops using `*`:
 ```
 a = Oryza(...)
 b = Oryza(...)
@@ -80,3 +80,15 @@ You can also use `Oryza.inspect_plant()` to see the "true crop" — an ASCII art
 ```
 
 ### Paddy Field
+***IN PROGRESS***
+
+Class `PaddyRow` instances provide a *row* of rice crops to simulate natural pollination among multiple rice crops.
+```
+p1 = PaddyRow() # will have 4 crops by default
+p2 = PaddyRow(size=6)
+p3 = PaddyRow(wilderness=True) # randomize some traits of each crop
+```
+
+`PaddyRow.sightsee()` and `PaddyRow.maturize()` act similary as `Oryza.inspect_plant()` and `Oryza.maturize()`.
+
+`PaddyRow.free_pollinate()` let all crops in the row which are mature spead their pollens by wind at once.

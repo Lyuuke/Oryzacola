@@ -21,13 +21,27 @@ a = Oryza(SeedShredding = (True, False), FullCaryopsis = True)
 ```
 … will give a crop whose "seed shredding" trait is heterozygous & dominant, while "full caryopsis" trait is homozygous & dominant.
 
-Hybriding two crops using `*`:
+Any "new" rice crop has its *growth stage* of 0, which means the crop is still a sprout. Currently any `Oryza` instance will not grow as time elapses. You can use `Oryza.maturize()` to ripen it, allowing the crop to produce pollens and seeds.
+
+After a rice crop becoming mature, you can hybrid two crops using `*`:
 ```
 a = Oryza(...)
 b = Oryza(...)
+a.maturize()
+b.maturize()
 c = a * b
 ```
-The new crop's genes follow Mendel's rules.
+
+The new crop's genes follow Mendel's rules. Another way (also a more natural way) is to have the crop receiving pollens from other crops (or from itself, as *Oryza sativa* is self-compatible), then randomly produce seeds by all the pollens it has received:
+```
+a = Oryza(...)
+b = Oryza(...)
+a.maturize()
+b.maturize()
+a.pollinated_by(b) # a pollen of B goes into A's "pollen depository"
+a.self_pollinate() # a pollen of A itself goes into A's "pollen depository"
+a.seed() # "seed" is also an instance of class Oryza
+```
 
 Simply print the crop to see its traits:
 ```

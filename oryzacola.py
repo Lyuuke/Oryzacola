@@ -32,11 +32,34 @@ plantInspection = '''
 
 plantInspectionStem = '\\\\|//\n'
 
+def createField(sh, sd, sz = 4):
+    if (not isinstance(sd, SeedBank)) and (not isinstance(sd, Oryza)):
+        tempErr = SeedOnlyError('稻田只能种植水稻（种子库、种子）')
+        raise tempErr
+    if sh.lower() == 'row':
+        return PaddyRow(size = sz, bank = sd)
+    else:
+        ...
+
+
 class SelfingError(Exception):
     pass
 
 class SeedOnlyError(Exception):
     pass
+
+class SeedBank:
+    def __init__(se, *sd):
+        se.bank = []
+        for i in sd:
+            if isinstance(i, Oryza):
+                se.bank.append(i)
+    def take(se):
+        if se.bank:
+            return random.choice(se.bank)
+        else:
+            tempErr = IndexError('种子库是空的')
+            raise tempErr
 
 class Pollen:
     def __init__(se, di = {}, ge = 1, **tr):
@@ -222,12 +245,26 @@ class SeedBag:
             raise tempErr
 
 class PaddyRow:
-    def __init__(se, size = 4, wilderness = False):
+    def __init__(se, size = 4, wilderness = False, bank = False):
         se.field = {}
         se.wind = 3 # 决定风媒传粉的最大距离
         if not wilderness:
-            for i in range(size):
-                se.field[i] = Oryza()
+            if not bank:
+                for i in range(size):
+                    se.field[i] = Oryza()
+            else:
+                if isinstance(bank, SeedBank):
+                    for i in range(size):
+                        se.field[i] = bank.take()
+                elif isinstance(bank, Oryza):
+                    for i in range(size):
+                        se.field[i] = bank
+                elif isinstance(bank, Pollen):
+                    for i in range(size):
+                        se.field[i] = bank * bank
+                else:
+                    tempErr = SeedOnlyError('稻田只能种植水稻（种子库、种子、花粉）')
+                    raise tempErr
         else:
             for i in range(size):
                 se.field[i] = Oryza(
@@ -272,10 +309,6 @@ class PaddyRow:
 
 
 if __name__ == '__main__':
-    p = PaddyRow(wilderness = True, size = 8)
-    b = SeedBag()
-    p.maturize()
-    p.free_pollinate()
-    for i in p.field:
-        b.collect(p.field[i].seed())
-    print(b)
+    a = SeedBank(Oryza(), Oryza(Yield = 10), Oryza(Yield = 6))
+    pr = PaddyRow(bank = a)
+    pr.sightsee()

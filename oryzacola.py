@@ -1,5 +1,10 @@
 import random
 
+oryzaFertilityThreshold = 3200
+# 达到可生殖阶段的累积获得积温阈值
+oryzaBiologicMinimum = 10
+# 生物学最低温度 == 10 C
+
 oryzaInfoFormat = '''
 物种:
     Oryza sativa
@@ -33,7 +38,8 @@ plantInspection = '''
 plantInspectionStem = '\\\\|//\n'
 
 def createField(sh, sd, sz = 4):
-    if (not isinstance(sd, SeedBank)) and (not isinstance(sd, Oryza)):
+    '''通过种子或种子库创建虚拟试验田'''
+    if (not isinstance(sd, SeedBag)) and (not isinstance(sd, Oryza)):
         tempErr = SeedOnlyError('稻田只能种植水稻（种子库、种子）')
         raise tempErr
     if sh.lower() == 'row':
@@ -48,18 +54,6 @@ class SelfingError(Exception):
 class SeedOnlyError(Exception):
     pass
 
-class SeedBank:
-    def __init__(se, *sd):
-        se.bank = []
-        for i in sd:
-            if isinstance(i, Oryza):
-                se.bank.append(i)
-    def take(se):
-        if se.bank:
-            return random.choice(se.bank)
-        else:
-            tempErr = IndexError('种子库是空的')
-            raise tempErr
 
 class Pollen:
     def __init__(se, di = {}, ge = 1, **tr):
@@ -89,6 +83,8 @@ class Pollen:
 
 class Oryza:
     def __init__(se, di = {}, ge = (1, 1), **tr):
+        se.acctemp = 0
+        # 积温，代替了之前的生长阶段
         se.growth_stage = 0
         # 生长阶段
         #   |-    YOUNG    -|   |- MATURE  -| SEEDING
@@ -219,29 +215,37 @@ class PollenBarrier:
             se.pollen_weights.append(wg)
 
 class SeedBag:
-    def __init__(se):
+    def __init__(se, *sd):
         se.bag = []
+        for i in sd:
+            if isinstance(i, Oryza):
+                se.bag.append(i)
     def __getitem__(se, lo):
         return se.bag[lo]
     def __repr__(se):
         glance = ''
+        seedChars = ['. ', 'o ', '0 ', 'O ']
+        # “颖果饱满性”和“糯性”性状决定表示种子使用的字符
+        #     | FC+ | FC-
+        # ----+-----+-----
+        # GL+ |  O  |  o
+        # GL- |  0  |  .
         for i in se.bag:
-            if True in i.traits['FullCaryopsis']:
-                if True in i.traits['Glutinous']:
-                    glance += 'O '
-                else:
-                    glance += '0 '
-            else:
-                if True in i.traits['Glutinous']:
-                    glance += 'o '
-                else:
-                    glance += '. '
+            indic = 2 * (True in i.traits['FullCaryopsis']) +\
+                1 * (True in i.traits['Glutinous'])
+            glance += seedChars[indic]
         return glance
+    def take(se):
+        if se.bag:
+            return random.choice(se.bag)
+        else:
+            tempErr = IndexError('种子库是空的')
+            raise tempErr
     def collect(se, sd):
         if isinstance(sd, Oryza):
             se.bag.append(sd)
         else:
-            tempErr = SeedOnlyError('种子袋只能装种子')
+            tempErr = SeedOnlyError('种子库只能装种子')
             raise tempErr
 
 class PaddyRow:
@@ -253,7 +257,7 @@ class PaddyRow:
                 for i in range(size):
                     se.field[i] = Oryza()
             else:
-                if isinstance(bank, SeedBank):
+                if isinstance(bank, SeedBag):
                     for i in range(size):
                         se.field[i] = bank.take()
                 elif isinstance(bank, Oryza):
@@ -299,16 +303,18 @@ class PaddyRow:
                 for j in neighbors:
                     if se.field[j].growth_stage >= 6:
                         se.field[j].pollinated_by(se.field[i], wg = neighbors[j])
-    def range_polinate(se, sl):
-        ...
     def tick(se):
         ...
     def ellapse(se, tp):
         ...
 
 
-
+'''
 if __name__ == '__main__':
-    a = SeedBank(Oryza(), Oryza(Yield = 10), Oryza(Yield = 6))
-    pr = PaddyRow(bank = a)
-    pr.sightsee()
+    a = PaddyRow(size = 10, wilderness = True)
+    a.maturize()
+    b = SeedBag()
+    for i in a.field:
+        b.collect(a[i])
+    print(b)
+'''

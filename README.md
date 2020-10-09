@@ -1,8 +1,8 @@
 # Oryzacola
-Oryzacola is a virtual paddy field with of rice hybriding simulations.
+Oryzacola is a virtual paddy field with rice hybriding simulations.
 
 ## What Is Rice
-Rice (scientific name *Oryza sativa*) is a primary grain which is widely cultivated in East Asia. Rice are usually consumed whole-grain, either boiled or steamed. Husked steamed white rice provides 45 grammes of carbohydrate per 100 g, and has a high glycemic index (GI) of *ca.* 84.
+Rice (scientific name *Oryza sativa*) is a primary grain widely cultivated in East Asia. Rice are usually consumed whole-grain, either boiled or steamed. Husked steamed white rice provides 45 grammes of carbohydrate per 100 g, and has a high glycemic index (GI) of *ca.* 84.
 
 ## How To Use
 
@@ -34,7 +34,7 @@ b.maturize()
 c = a * b
 ```
 
-The new crop's genes follow Mendel's rules. Another way (also a more natural way) is to have the crop receiving pollens from other crops (or from itself, as *Oryza sativa* is self-compatible), then randomly produce seeds by all the pollens it has received:
+The new crop's genes follow Mendel's rules. Another way (also a more natural way) is to have the crop receiving pollens from other crops (or from itself, as *Oryza sativa* is self-compatible), then randomly produce seeds by drawing pollens from all the pollens it has received:
 ```
 a = Oryza(...)
 b = Oryza(...)
@@ -81,6 +81,19 @@ You can also use `Oryza.inspect_plant()` to see the "true crop" — an ASCII art
 \\|//
 ```
 
+### Seed Bank
+(***IN PROGRESS***)
+
+Class `SeedBag` instances provide simple storage of rice seeds. You can fill it with seeds at first, or use it to collect seeds at any time.
+```
+sBag1 = SeedBag() # an empty seed bank
+sBag2 = SeedBag(seed1, seed2, ...) # all parameters are instances of Oryza
+sBag1.collect(crop1.seed()) # a direct way to collect a seed from mature crop1
+sBag2.take() # return a random seed from the seed bank (not actually consuming)
+```
+
+Seed banks are useful to create paddy fields. See the next section.
+
 ### Paddy Field
 (***IN PROGRESS***)
 
@@ -89,6 +102,9 @@ Class `PaddyRow` instances provide a *row* of rice crops to simulate natural pol
 p1 = PaddyRow() # will have 4 crops by default
 p2 = PaddyRow(size=6)
 p3 = PaddyRow(wilderness=True) # randomize some traits of each crop
+p4 = PaddyRow(bank=crop1) # crop1 is an instance of Oryza
+p5 = PaddyRow(bank=sBag) # sBag is a SeedBag instance
+    # this will fill the row with random seeds from the seed bank
 ```
 
 `PaddyRow.sightsee()` and `PaddyRow.maturize()` act similary as `Oryza.inspect_plant()` and `Oryza.maturize()`.

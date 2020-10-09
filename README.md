@@ -7,7 +7,7 @@ Rice (scientific name *Oryza sativa*) is a primary grain which is widely cultiva
 ## How To Use
 
 ### Single Rice Crop
-Firstly import this package:
+Import this module:
 ```
 from oryzacola import *
 ```
@@ -22,6 +22,8 @@ a = Oryza(SeedShredding = (True, False), FullCaryopsis = True)
 … will give a crop whose "seed shredding" trait is heterozygous & dominant, while "full caryopsis" trait is homozygous & dominant.
 
 Any "new" rice crop has its *growth stage* (`Oryza.growth_stage`) of 0, which means the crop is still a sprout. Currently any `Oryza` instance will not grow as time elapses. You can use `Oryza.maturize()` to ripen it, allowing the crop to produce pollens and seeds.
+
+(***UPCOMING:*** Growth stage will be removed by next version, and be succeeded by *accumulated temperature*.)
 
 After a rice crop having become mature, you can hybrid two crops using `*`:
 ```
@@ -66,7 +68,7 @@ Simply print the crop to see its traits:
 株高:
     3级 / 3级
 ```
-You can also use `Oryza.inspect_plant()` to see the "true crop" — an ASCII art, which will adjust to certain genes. Just for fun.
+You can also use `Oryza.inspect_plant()` to see the "true crop" — an ASCII art, which will adjust to certain genes, but does not reflect the crop's growth stage. Just for fun.
 ```
 >>> a.inspect_plant()
 >>>
@@ -80,7 +82,7 @@ You can also use `Oryza.inspect_plant()` to see the "true crop" — an ASCII art
 ```
 
 ### Paddy Field
-***IN PROGRESS***
+(***IN PROGRESS***)
 
 Class `PaddyRow` instances provide a *row* of rice crops to simulate natural pollination among multiple rice crops.
 ```
@@ -91,4 +93,4 @@ p3 = PaddyRow(wilderness=True) # randomize some traits of each crop
 
 `PaddyRow.sightsee()` and `PaddyRow.maturize()` act similary as `Oryza.inspect_plant()` and `Oryza.maturize()`.
 
-`PaddyRow.free_pollinate()` let all crops in the row which are mature spead their pollens by wind at once.
+`PaddyRow.free_pollinate()` lets all crops in the row which are mature spead their pollens by wind at once.
